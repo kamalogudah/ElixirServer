@@ -5,9 +5,13 @@ defmodule Servy.Handler do
     # format_response(conv)
     request
     |> parse
+    |> log
     |> route
     |> format_response
   end
+
+  def log(conv), do: IO.inspect conv
+
 
   def parse(request) do
     # first_line = request |> String.split("\n") |> List.first
@@ -24,23 +28,28 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-    conv = %{ method: "GET", path: "/widthings", resp_body: "Bears, Lions, Tigers" }
+    if conv.path == "/wildthings" do
+      # same as Map.put(conv, :resp_body,"Bears, Lions, Tigers" )
+      %{ conv | resp_body: "Bears, Lions, Tigers" }
+    else
+      %{ conv | resp_body: "Teddy, Smokey, Paddington" }
+    end
   end
 
   def format_response(conv) do
     """
     HTTP/1.1 200 OK
     Content-Type: text/html
-    Content-Length: 20
+    Content-Length: #{String.length(conv.resp_body)}
 
-    Bears, Lions, Tigers
+    #{conv.resp_body}
     """
   end
 
 end
 
 request = """
-GET /wildthings HTTP/1.1
+GET /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
