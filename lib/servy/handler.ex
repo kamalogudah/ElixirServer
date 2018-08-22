@@ -1,9 +1,28 @@
+defmodule Servy.Plugins do
+
+  def track(%{status: 404, path: path} = conv) do
+    IO.puts "Warning: #{path} is on the loose!"
+    conv
+  end
+
+  def track(conv), do: conv
+
+  def rewrite_path(%{path: "/wildlife"} = conv) do
+    %{ conv | path: "/wildthings" }
+  end
+
+  def rewrite_path(conv), do: conv
+
+  def log(conv), do: IO.inspect conv
+
+end
+
 defmodule Servy.Handler do
   @moduledoc """
   Handles Http requests
   """
   @pages_path  Path.expand("../../pages", __DIR__)
-
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
   @doc """
   Transforms the request into a response
   """
@@ -23,21 +42,6 @@ defmodule Servy.Handler do
   @doc """
    Logs 404 requests
   """
-  def track(%{status: 404, path: path} = conv) do
-    IO.puts "Warning: #{path} is on the loose!"
-    conv
-  end
-
-  def track(conv), do: conv
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{ conv | path: "/wildthings" }
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv), do: IO.inspect conv
-
 
   def parse(request) do
     # first_line = request |> String.split("\n") |> List.first
